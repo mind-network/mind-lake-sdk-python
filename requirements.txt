@@ -1,0 +1,4 @@
+eth_account
+web3
+pynacl
+colorlog
