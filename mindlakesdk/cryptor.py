@@ -3,14 +3,12 @@ from decimal import Decimal
 import struct
 from enum import Enum
 from Crypto.Random import get_random_bytes
-from MindLake.utils import ResultType, Session, DataType
-import MindLake.message
-import MindLake.KeyHelper
-import MindLake.utils
+from mindlakesdk.utils import ResultType, Session, DataType
+import mindlakesdk.message
+import mindlakesdk.keyhelper
+import mindlakesdk.utils
 
 class Cryptor:
-
-    __session = None
 
     class EncType(Enum):
         enc_int4 = 1
@@ -21,26 +19,26 @@ class Cryptor:
         enc_text = 7
         enc_timestamp = 8
 
-    def setSession(session: Session):
-        Cryptor.__session = session
+    def __init__(self, session: Session):
+        self.__session = session
     
-    def encrypt(data, columnOrType: str|DataType) -> ResultType:
+    def encrypt(self, data, columnOrType: str|DataType) -> ResultType:
         if isinstance(columnOrType, DataType):
             dataType = columnOrType
-            result = MindLake.message.getDKbyName(Cryptor.__session)
+            result = mindlakesdk.message.getDKbyName(self.__session)
             if not result:
                 return result
         else:
             tableName, columnName = columnOrType.split('.')
-            result = MindLake.message.getDataTypeByName(Cryptor.__session, tableName, columnName)
+            result = mindlakesdk.message.getDataTypeByName(self.__session, tableName, columnName)
             if not result:
                 return result
             dataType = DataType(result.data)
-            result = MindLake.message.getDKbyName(Cryptor.__session, Cryptor.__session.walletAddress, tableName, columnName)
+            result = mindlakesdk.message.getDKbyName(self.__session, self.__session.walletAddress, tableName, columnName)
             # Temporary solution for MS not returning Error Code
             if result.code == 40010:
                 # DK not found, create one
-                result = MindLake.KeyHelper.genDK(Cryptor.__session, tableName, columnName)
+                result = mindlakesdk.keyhelper.genDK(self.__session, tableName, columnName)
                 if not result:
                     return result
             elif not result:
@@ -51,17 +49,17 @@ class Cryptor:
         data = Cryptor.__encodeByDataType(data, dataType)
         ctxid = result.data['ctxId']
         dkCipher = result.data['encryptedDek']
-        dkID, dk = MindLake.KeyHelper.decrypt_dek_b64(Cryptor.__session.mk, dkCipher)
+        dkID, dk = mindlakesdk.keyhelper.decryptDKb64(self.__session.mk, dkCipher)
         alg = result.data['algorithm']
         header = Cryptor.__genCryptoHeader(ctxid, encTypeNum)
         checkCode = Cryptor.__genCheckCode(data, 1)
         data_to_enc = data + checkCode
         if alg == 3:
             iv = get_random_bytes(16)
-            encrypted_data = MindLake.utils.aesEncrypt(dk, iv, data_to_enc)
+            encrypted_data = mindlakesdk.utils.aesEncrypt(dk, iv, data_to_enc)
         elif alg == 0:
             iv = get_random_bytes(12)
-            encrypted_data = MindLake.utils.aesGCMEncrypt(dk, iv, data_to_enc)
+            encrypted_data = mindlakesdk.utils.aesGCMEncrypt(dk, iv, data_to_enc)
         buf = header + iv + encrypted_data
         tmp = buf[1:]
         checkCode2 = Cryptor.__genCheckCode(tmp, 1)
@@ -93,7 +91,7 @@ class Cryptor:
             raise Exception("Unsupported encryption type")
         return result
 
-    def decrypt(cipher: bytes|str) -> ResultType:
+    def decrypt(self, cipher: bytes|str) -> ResultType:
         if isinstance(cipher, str):
             data = bytes.fromhex(cipher[2:])
         else:
@@ -101,31 +99,31 @@ class Cryptor:
         header = Cryptor.__extractCryptoHeader(data)
         encTypeNum = Cryptor.__extractEncType(header)
         ctxId = Cryptor.__extractCtxId(header)
-        result = MindLake.message.getDKbyCid(Cryptor.__session, ctxId)
+        result = mindlakesdk.message.getDKbyCid(self.__session, ctxId)
         if not result:
             return result
         dkCipher = result.data['encryptedDek']
         # TODO: catch decryption error
         try:
-            dkID, dk = MindLake.KeyHelper.decrypt_dek_b64(Cryptor.__session.mk, dkCipher)
+            dkID, dk = mindlakesdk.keyhelper.decryptDKb64(self.__session.mk, dkCipher)
         except:
             return ResultType(60003, "Can't handle DK")
         alg = result.data['algorithm']
         if alg is None:
-            raise Exception("Cannot find DEK by ctxId")
+            raise Exception("Cannot find data key by ctxId")
         else:
             idx = (header[1] & 0x7) + 2
             if alg == 3:
                 iv = data[idx:idx+16]
                 cipherBlob = data[idx+16:]
-                plainBlob = MindLake.utils.aesDecrypt(dk, iv, cipherBlob)
+                plainBlob = mindlakesdk.utils.aesDecrypt(dk, iv, cipherBlob)
             elif alg == 0:
                 iv = data[idx:idx+12]
                 idx += 12
                 mac = data[idx:idx+16]
                 idx += 16
                 cipherBlob = data[idx:]
-                plainBlob = MindLake.utils.aesGCMDecrypt(dk, iv, cipherBlob, mac)
+                plainBlob = mindlakesdk.utils.aesGCMDecrypt(dk, iv, cipherBlob, mac)
             else:
                 raise Exception("Unsupported algorithm to decrypt")
             result = plainBlob[:-1]
