@@ -96,7 +96,7 @@ def prepareKeys(web3, walletAccount):
     else:
         mk = mindlakesdk.utils.genAESKey()
         sk = mindlakesdk.utils.genRSAKey()
-        skBytes = sk.exportKey('DER')
+        skBytes = sk.exportKey('DER', pkcs=8)
         skIV = mindlakesdk.utils.get_random_bytes(16)
         skCipher = mindlakesdk.utils.aesEncrypt(mk, skIV, skBytes)
         skCipher = skIV + skCipher
