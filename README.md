@@ -14,15 +14,14 @@ The Mind Lake SDK utilizes Mind Lake's encryption storage and privacy computing 
 
 ### Dependencies
 
-* Python > 3.7
+* Python > 3.10
 * pip
 * web3
 * pynacl
-* colorlog (optional for logging only) 
 
 ### Installing
 
-* pip install mindlake
+* pip install mindlakesdk
 
 ### Executing program
 
@@ -30,18 +29,18 @@ The Mind Lake SDK utilizes Mind Lake's encryption storage and privacy computing 
 * [more examples](https://mind-network.gitbook.io/mind-lake-sdk/use-cases)
 * Step-by-step bullets
 ```
-from mindlake import MindLake
+import mindlakesdk
 ...
 ```
 
 ## code
 ```
 mind-lake-sdk-python
-|-- MindLake # source code
+|-- mindlakesdk # source code
 |   |-- __init__.py
-|   |-- DataLake.py
-|   |-- Permission.py
-|   |-- Cryptor.py
+|   |-- datalake.py
+|   |-- permission.py
+|   |-- cryptor.py
 |   └-- utils.py
 |-- tests # unit test code
 |-- examples # use case examples

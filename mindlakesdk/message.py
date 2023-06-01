@@ -1,4 +1,4 @@
-from MindLake.utils import ResultType, request, Session
+from mindlakesdk.utils import ResultType, request, Session
 import logging
 
 def getNounce(session: Session):
@@ -42,14 +42,14 @@ def sendMKRegister(session: Session, envelope):
     data = {"bizType":102, "envelope":envelope, "databasePublicKey":session.nodePK}
     return __requestCommon(session, data)
     
-def sendPKRegister(session: Session, pkIDStr, publicKey, rsaSigStr, mekSigStr):
+def sendPKRegister(session: Session, pkIDStr, publicKey, rsaSigStr, mkSigStr):
     data = {
         "bizType":104, 
         "mekId":session.accountID, 
         "pukId":pkIDStr,
         "publicKey":publicKey,
         "privateSig":rsaSigStr,
-        "mekSig":mekSigStr
+        "mekSig":mkSigStr
     }
     return __requestCommon(session, data)
 

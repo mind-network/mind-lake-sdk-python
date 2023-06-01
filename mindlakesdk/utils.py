@@ -7,33 +7,8 @@ from Crypto.Random import get_random_bytes
 from enum import Enum
 import requests
 import json
-import MindLake.Settings as Settings
+import mindlakesdk.settings as settings
 import logging
-import colorlog 
-import sys
-import os
-
-def setLogging(logginglevel):
-    root = logging.getLogger()
-    if len(root.handlers): ### ensure only one logging handler is added
-        logging.debug("multiple logging exists")
-        root.handlers.clear()
-    root.setLevel(logginglevel)
-        
-    format      = '%(asctime)s|%(levelname)-8s |: %(message)s'
-    date_format = '%Y-%m-%d %H:%M:%S'
-    if 'colorlog' in sys.modules and os.isatty(2):
-        cformat = '%(log_color)s' + format
-        f = colorlog.ColoredFormatter(cformat, date_format,
-              log_colors = { 'DEBUG'   : 'cyan',       'INFO' : 'green',
-                             'WARNING' : 'bold_red', 'ERROR': 'bold_red',
-                             'CRITICAL': 'bold_red' })
-    else:
-        f = logging.Formatter(format, date_format)
-    ch = logging.StreamHandler()
-    ch.setFormatter(f)
-    root.addHandler(ch)
-    
 
 class ResultType:
     def __init__(self, code: int, message: str = None, data = None):
@@ -64,7 +39,8 @@ class Session:
         self.accountID = None
         self.nodePK = None
         self.pkID = None
-        self.appKey = "None"
+        self.appKey = None
+        self.gateway = None
         
 def genRSAKey():
     rsaKey = RSA.generate(2048)
@@ -137,11 +113,11 @@ def request(data, session: Session):
     headers = {}
     headers['Content-Type'] = 'application/json'
     headers['wa'] = session.walletAddress
-    headers['ver'] = Settings.VERSION
+    headers['ver'] = settings.VERSION
     headers['app'] = session.appKey
     if session.token:
         headers['token'] = session.token
-    response = requests.post(Settings.GATEWAY, json=data, headers=headers)
+    response = requests.post(session.gateway, json=data, headers=headers)
     logging.debug("============== Mind SDK request ==============")
     logging.debug('MindSDKHeaders: %s'%headers)
     logging.debug("MindSDKData: %s"%data)
