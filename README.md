@@ -47,6 +47,7 @@ mind-lake-sdk-python
 |   └-- utils.py
 |-- tests # unit test code
 |-- examples # use case examples
+|-- tutorial # step-by-step tutorial
 |-- README.md
 └--- LICENSE
 

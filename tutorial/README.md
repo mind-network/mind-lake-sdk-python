@@ -46,7 +46,7 @@
 
 
 ## :star2: 0. Other Programming Languages
-- [TypeScript](https://github.com/mind-network/mind-lake-sdk-typescript/tutorial)
+- [TypeScript](https://github.com/mind-network/mind-lake-sdk-typescript/)
 
 ## :star2: 1. Install Python
 
@@ -127,13 +127,16 @@ Here is an example of Python installation with official installer, you can also 
 3. Click the appropriate link for your system to download the executable file: Windows installer (64-bit) or Windows installer (32-bit).
 
 #### :dart: 1.2.2 Step2: Running the Executable Installer
-1. After the installer is downloaded, double-click the .exe file, for example python-3.10.10-amd64.exe, to run the Python installer.
-2. Select the Install launcher for all users checkbox, which enables all users of the computer to access the Python launcher application.
-3. Select the Add python.exe to PATH checkbox, which enables users to launch Python from the command line.
-4. If you’re just getting started with Python and you want to install it with default features as described in the dialog, then click Install Now.
+1. After the installer is downloaded, double-click the .exe file, for example python-3.11.3-amd64.exe, to run the Python installer.
+2. Select the Add python.exe to PATH checkbox, which enables users to launch Python from the command line.
+![Python installer add path](imgs/python_install_path.png)
+3. If you’re just getting started with Python and you want to install it with default features as described in the dialog, then click Install Now.
+4. Simply wait for the installation to complete and then click the "Close" button.
+![Python installer complete](imgs/python_install_complete.png)
 
 #### :dart: 1.2.3 Step3: Verify the Python Installation
 Go to Start and enter cmd in the search bar. Click Command Prompt.
+![Windows Command Prompt](imgs/windows_cmd.png)
 Enter the following command in the command prompt:
 ```cmd
 python --version
@@ -199,7 +202,8 @@ env.py contains the settings of parameters used in examples and use cases, you c
 #### :dart: 4.1.1 Install Wallet
 1. Install [MetaMask](https://metamask.io/download/) plugins in Chrome Browser
 2. [Sign up a MetaMask Wallet](https://myterablock.medium.com/how-to-create-or-import-a-metamask-wallet-a551fc2f5a6b)
-3. Change the network to Goerli TestNet
+3. Change the network to Goerli TestNet. If the TestNets aren't displayed, turn on "Show test networks" in Settings.
+![MetaMask TestNet](imgs/metamask_testnet.png)
 4. Goerli Faucet for later gas fee if does not have: [Alchemy Goerli Faucet](https://goerlifaucet.com/), [Quicknode Goerli Faucet](https://faucet.quicknode.com/ethereum/goerli), [Moralis Goerli Faucet](https://moralis.io/faucets/)
 
   ![image](./imgs/change_chain.png)
