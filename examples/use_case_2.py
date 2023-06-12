@@ -5,7 +5,7 @@ from base64 import a85decode, a85encode
 from hashlib import md5
 
 # 1. connect to MindLake
-mindlake = mindlakesdk.connect(env.walletPrivateKeyBob, env.appKey)
+mindlake = mindlakesdk.connect(env.walletPrivateKeyAlice, env.appKey)
 assert mindlake, mindlake.message
 
 result = mindlake.datalake.dropTable('album')

@@ -1,12 +1,9 @@
 import env
 import mindlakesdk
-import logging
-
-logging.basicConfig(level=logging.DEBUG)
 
 # the policy grant target should be an existing user in MindLake, so first register Charlie
-mindlake = mindlakesdk.connect(env.walletPrivateKeyCharlie, env.appKey)
-assert mindlake, mindlake.message
+mindlakeCharlie = mindlakesdk.connect(env.walletPrivateKeyCharlie, env.appKey)
+assert mindlakeCharlie, mindlakeCharlie.message
 
 def writeDataGrantToCharlie(walletPrivateKey, appKey, data) -> str:
     # connect to MindLake
@@ -56,15 +53,13 @@ policyIDBob = writeDataGrantToCharlie(env.walletPrivateKeyBob, env.appKey, [
 ])
 
 # Charlie confirm the permission
-mindlake = mindlakesdk.connect(env.walletPrivateKeyCharlie, env.appKey)
-assert mindlake, mindlake.message
-result = mindlake.permission.confirm(policyIDAlice)
+result = mindlakeCharlie.permission.confirm(policyIDAlice)
 assert result, result.message
-result = mindlake.permission.confirm(policyIDBob)
+result = mindlakeCharlie.permission.confirm(policyIDBob)
 assert result, result.message
 
 # Charlie query and calculate the total volume of each wallet
-result = mindlake.datalake.query(f'''
+result = mindlakeCharlie.datalake.query(f'''
 SELECT combine."WalletAddress", SUM(combine."Volume") FROM
 (SELECT "WalletAddress","Volume" FROM "{env.walletAddressAlice[2:].lower()}"."transaction_temp"
 UNION ALL
@@ -77,10 +72,10 @@ print('-'*57)
 print('|', result.data["columnList"][0], " "*28, '|', result.data["columnList"][1], '\t|')
 print('-'*57)
 for row in result.data['data']:
-    result = mindlake.cryptor.decrypt(row[0])
+    result = mindlakeCharlie.cryptor.decrypt(row[0])
     assert result, result.message
     walletAddress = result.data
-    result = mindlake.cryptor.decrypt(row[1])
+    result = mindlakeCharlie.cryptor.decrypt(row[1])
     assert result, result.message
     sumVolume = result.data
     print(f'| {walletAddress} | {sumVolume:.1f}\t|')

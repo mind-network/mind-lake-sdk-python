@@ -1,11 +1,8 @@
 import env
 import mindlakesdk
-import logging
-
-# logging.basicConfig(level=logging.DEBUG)
 
 # 1. connect to mindlake
-mindlake = mindlakesdk.connect(env.walletPrivateKeyBob, env.appKey)
+mindlake = mindlakesdk.connect(env.walletPrivateKeyAlice, env.appKey)
 assert mindlake, mindlake.message
 
 result = mindlake.datalake.dropTable('wallet_balance')
