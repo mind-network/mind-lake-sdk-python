@@ -1,6 +1,3 @@
-walletAddress = ''
-walletPrivateKey = ''
-
 walletAddressAlice = ''
 walletPrivateKeyAlice = ''
 

@@ -23,15 +23,18 @@ The Mind Lake SDK utilizes Mind Lake's encryption storage and privacy computing 
 
 * pip install mindlakesdk
 
-### Executing program
-
-* [quick starts](https://mind-network.gitbook.io/mind-lake-sdk/get-started)
-* [more examples](https://mind-network.gitbook.io/mind-lake-sdk/use-cases)
-* Step-by-step bullets
+### Import
 ```
 import mindlakesdk
 ...
 ```
+
+### More examples
+* [step-by-step tutorial](/tutorial/README.md)
+* [quick starts](https://mind-network.gitbook.io/mind-lake-sdk/get-started)
+* [more examples](https://mind-network.gitbook.io/mind-lake-sdk/use-cases)
+
+
 
 ## code
 ```
@@ -44,6 +47,7 @@ mind-lake-sdk-python
 |   └-- utils.py
 |-- tests # unit test code
 |-- examples # use case examples
+|-- tutorial # step-by-step tutorial
 |-- README.md
 └--- LICENSE
 
