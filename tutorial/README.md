@@ -42,7 +42,7 @@ Successfully installed mindlakesdk-1.0.1
 ```
 
 2. Validate the installation in Terminal
-```
+```shell
 $ pip show mindlakesdk
 Name: mindlakesdk
 Version: 1.0.1
@@ -56,8 +56,8 @@ Requires: eth-account, pynacl, web3
 Required-by:
 ```
 
-3. You can also validate in idel
-```
+3. You can also validate in IDLE
+```shell
 $ python3
 Python 3.10.11 (main, May  1 2023, 01:38:51) [Clang 16.0.2 ] on darwin
 Type "help", "copyright", "credits" or "license" for more information.
