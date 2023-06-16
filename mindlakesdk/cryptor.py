@@ -21,36 +21,15 @@ class Cryptor:
 
     def __init__(self, session: Session):
         self.__session = session
+        self.cryptParamsByColumn = {}
+        self.cryptParamsByID = {}
     
-    def encrypt(self, data, columnOrType: str|DataType) -> ResultType:
-        if isinstance(columnOrType, DataType):
-            dataType = columnOrType
-            result = mindlakesdk.message.getDKbyName(self.__session)
-            if not result:
-                return result
-        else:
-            tableName, columnName = columnOrType.split('.')
-            result = mindlakesdk.message.getDataTypeByName(self.__session, tableName, columnName)
-            if not result:
-                return result
-            dataType = DataType(result.data)
-            result = mindlakesdk.message.getDKbyName(self.__session, self.__session.walletAddress, tableName, columnName)
-            # Temporary solution for MS not returning Error Code
-            if result.code == 40010:
-                # DK not found, create one
-                result = mindlakesdk.keyhelper.genDK(self.__session, tableName, columnName)
-                if not result:
-                    return result
-            elif not result:
-                return result
-            else:
-                pass
-        encTypeNum = Cryptor.EncType['enc_' + dataType.name].value
+    def encrypt(self, data, columnOrType) -> ResultType:
+        result = self.__getEncryptParams(columnOrType)
+        if not result:
+            return result
+        ctxid, encTypeNum, dk, alg, dataType = result.data
         data = Cryptor.__encodeByDataType(data, dataType)
-        ctxid = result.data['ctxId']
-        dkCipher = result.data['encryptedDek']
-        dkID, dk = mindlakesdk.keyhelper.decryptDKb64(self.__session.mk, dkCipher)
-        alg = result.data['algorithm']
         header = Cryptor.__genCryptoHeader(ctxid, encTypeNum)
         checkCode = Cryptor.__genCheckCode(data, 1)
         data_to_enc = data + checkCode
@@ -66,6 +45,42 @@ class Cryptor:
         result = checkCode2 + tmp
         resultHex = '\\x' + result.hex()
         return ResultType(0, None, resultHex)
+
+    def __getEncryptParams(self, columnOrType):
+        result = self.cryptParamsByColumn.get(columnOrType)
+        if not result:
+            if isinstance(columnOrType, DataType):
+                dataType = columnOrType
+                result = mindlakesdk.message.getDKbyName(self.__session)
+                if not result:
+                    return result
+            else:
+                tableName, columnName = columnOrType.split('.')
+                result = mindlakesdk.message.getDataTypeByName(self.__session, tableName, columnName)
+                if not result:
+                    return result
+                dataType = DataType(result.data)
+                result = mindlakesdk.message.getDKbyName(self.__session, self.__session.walletAddress, tableName, columnName)
+                # Temporary solution for MS not returning Error Code
+                if result.code == 40010:
+                    # DK not found, create one
+                    result = mindlakesdk.keyhelper.genDK(self.__session, tableName, columnName)
+                    if not result:
+                        return result
+                elif not result:
+                    return result
+                else:
+                    pass
+            encTypeNum = Cryptor.EncType['enc_' + dataType.name].value
+            ctxid = result.data['ctxId']
+            dkCipher = result.data['encryptedDek']
+            dkID, dk = mindlakesdk.keyhelper.decryptDKb64(self.__session.mk, dkCipher)
+            alg = result.data['algorithm']
+            result = (ctxid, encTypeNum, dk, alg, dataType)
+            self.cryptParamsByColumn[columnOrType] = result
+            self.cryptParamsByID[ctxid] = (dk, alg)
+        return ResultType(0, None, result)
+
 
     def __encodeByDataType(data, dataType: DataType) -> bytes:
         if dataType == DataType.int4:
@@ -91,7 +106,7 @@ class Cryptor:
             raise Exception("Unsupported encryption type")
         return result
 
-    def decrypt(self, cipher: bytes|str) -> ResultType:
+    def decrypt(self, cipher) -> ResultType:
         if isinstance(cipher, str):
             data = bytes.fromhex(cipher[2:])
         else:
@@ -99,40 +114,53 @@ class Cryptor:
         header = Cryptor.__extractCryptoHeader(data)
         encTypeNum = Cryptor.__extractEncType(header)
         ctxId = Cryptor.__extractCtxId(header)
-        result = mindlakesdk.message.getDKbyCid(self.__session, ctxId)
+        result = self.__getDecryptParams(ctxId)
         if not result:
             return result
-        dkCipher = result.data['encryptedDek']
-        # TODO: catch decryption error
-        try:
-            dkID, dk = mindlakesdk.keyhelper.decryptDKb64(self.__session.mk, dkCipher)
-        except:
-            return ResultType(60003, "Can't handle DK")
-        alg = result.data['algorithm']
-        if alg is None:
-            raise Exception("Cannot find data key by ctxId")
+        dk, alg = result.data
+        idx = (header[1] & 0x7) + 2
+        if alg == 3:
+            iv = data[idx:idx+16]
+            cipherBlob = data[idx+16:]
+            plainBlob = mindlakesdk.utils.aesDecrypt(dk, iv, cipherBlob)
+        elif alg == 0:
+            iv = data[idx:idx+12]
+            idx += 12
+            mac = data[idx:idx+16]
+            idx += 16
+            cipherBlob = data[idx:]
+            plainBlob = mindlakesdk.utils.aesGCMDecrypt(dk, iv, cipherBlob, mac)
         else:
-            idx = (header[1] & 0x7) + 2
-            if alg == 3:
-                iv = data[idx:idx+16]
-                cipherBlob = data[idx+16:]
-                plainBlob = mindlakesdk.utils.aesDecrypt(dk, iv, cipherBlob)
-            elif alg == 0:
-                iv = data[idx:idx+12]
-                idx += 12
-                mac = data[idx:idx+16]
-                idx += 16
-                cipherBlob = data[idx:]
-                plainBlob = mindlakesdk.utils.aesGCMDecrypt(dk, iv, cipherBlob, mac)
-            else:
-                raise Exception("Unsupported algorithm to decrypt")
-            result = plainBlob[:-1]
-            checkCode = plainBlob[-1:]
-            checkCode2 = Cryptor.__genCheckCode(result, 1)
-            if checkCode != checkCode2:
-                raise Exception("Check code is not correct")
-            result = Cryptor.__decodeByEncType(result, Cryptor.EncType(encTypeNum))
-            return ResultType(0, None, result)
+            return ResultType(60004, "Unsupported algorithm to decrypt")
+        result = plainBlob[:-1]
+        checkCode = plainBlob[-1:]
+        checkCode2 = Cryptor.__genCheckCode(result, 1)
+        if checkCode != checkCode2:
+            return ResultType(60005, "Check code of cipher is not correct")
+        result = Cryptor.__decodeByEncType(result, Cryptor.EncType(encTypeNum))
+        return ResultType(0, None, result)
+
+    def __getDecryptParams(self, ctxId: int):
+        params = self.cryptParamsByID.get(ctxId)
+        if not params:
+            result = mindlakesdk.message.getDKbyCid(self.__session, ctxId)
+            if not result:
+                return result
+            if not result.data:
+                return ResultType(60002, "Can't get data key")
+            dkCipher = result.data['encryptedDek']
+            if not dkCipher:
+                return ResultType(60002, "Can't get data key")
+            try:
+                dkID, dk = mindlakesdk.keyhelper.decryptDKb64(self.__session.mk, dkCipher)
+            except:
+                return ResultType(60003, "Can't handle data key")
+            alg = result.data['algorithm']
+            if alg is None:
+                return ResultType(60002, "Can't get data key")
+            params = (dk, alg)
+            self.cryptParamsByID[ctxId] = params
+        return ResultType(0, None, params)
 
     def __decodeByEncType(data, encType: EncType):
         if encType == Cryptor.EncType.enc_int4:
@@ -187,7 +215,7 @@ class Cryptor:
         type_value = (tmp_value & 0xF8) >> 3
         return type_value
     
-    def __extractCtxId(header):
+    def __extractCtxId(header) -> int:
         ctxIdLen = header[1] & 0x7
         assert len(header) == ctxIdLen + 2
         ctxId = 0
@@ -216,7 +244,7 @@ class Cryptor:
         head[1] = tmp_val
         return bytes(head)
 
-    def __genCheckCode(data, resultSize):
+    def __genCheckCode(data: bytes, resultSize):
         tmpCode = bytearray(resultSize)
         for i in range(len(data)):
             n = i % resultSize
