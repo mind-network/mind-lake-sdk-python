@@ -140,3 +140,9 @@ class Permission:
     def listGrantedColumn(self, walletAddress: str) -> ResultType:
         return mindlakesdk.message.sendListGrantedColumn(self.__session, walletAddress) 
     
+    def listOwner(self) -> ResultType:
+        return mindlakesdk.message.sendListOwner(self.__session)
+    
+    def listOwnerColumn(self, walletAddress: str) -> ResultType:
+        return mindlakesdk.message.sendListOwnerColumn(self.__session, walletAddress)
+    
