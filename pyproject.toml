@@ -4,7 +4,7 @@ build-backend = "hatchling.build"
 
 [project]
 name = "mindlakesdk"
-version = "v1.0.1"
+version = "v1.0.2"
 authors = [
   { name="Mind Labs", email="biz@mindnetwork.xyz" },
 ]
@@ -26,3 +26,6 @@ dependencies = [
 [project.urls]
 "Homepage" = "https://github.com/mind-network/mind-lake-sdk-python"
 "Bug Tracker" = "https://github.com/mind-network/mind-lake-sdk-python/issues"
+
+[tool.hatch.build]
+exclude = ["/examples", "/tests", "/tutorial"]
