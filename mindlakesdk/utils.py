@@ -5,7 +5,6 @@ from Crypto.PublicKey import RSA
 from Crypto.Hash import SHA256, HMAC
 from Crypto.Random import get_random_bytes
 from enum import Enum
-import requests
 import json
 import mindlakesdk.settings as settings
 import logging
@@ -41,6 +40,7 @@ class Session:
         self.pkID = None
         self.appKey = None
         self.gateway = None
+        self.requstSession = None
         
 def genRSAKey():
     rsaKey = RSA.generate(2048)
@@ -117,7 +117,7 @@ def request(data, session: Session):
     headers['app'] = session.appKey
     if session.token:
         headers['token'] = session.token
-    response = requests.post(session.gateway, json=data, headers=headers)
+    response = session.requstSession.post(session.gateway, json=data, headers=headers)
     logging.debug("============== Mind SDK request ==============")
     logging.debug('MindSDKHeaders: %s'%headers)
     logging.debug("MindSDKData: %s"%data)
