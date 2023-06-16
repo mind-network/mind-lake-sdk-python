@@ -2,6 +2,7 @@ name = "mindlakesdk"
 
 from eth_account.messages import encode_defunct
 from web3 import Web3
+import requests
 
 import mindlakesdk.settings as settings
 import mindlakesdk.utils
@@ -22,6 +23,7 @@ class MindLake(ResultType):
         logging.debug(__name__)
         self.__session = mindlakesdk.utils.Session()
         session = self.__session
+        session.requstSession = requests.Session()
         self.datalake = DataLake(session)
         self.cryptor = Cryptor(session)
         self.permission = Permission(session)

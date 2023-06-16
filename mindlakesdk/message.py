@@ -143,8 +143,16 @@ def sendListGrantee(session: Session) -> ResultType:
     data = {"bizType":126}
     return __requestCommon(session, data)
 
-def sendListGrantedColumn(session: Session, walletAddress: str) -> ResultType:
-    data = {"bizType":127, 'targetWalletAddress': walletAddress}
+def sendListGrantedColumn(session: Session, targetWalletAddress: str) -> ResultType:
+    data = {"bizType":127, 'targetWalletAddress': targetWalletAddress}
+    return __requestCommon(session, data)
+
+def sendListOwner(session: Session) -> ResultType:
+    data = {"bizType":130}
+    return __requestCommon(session, data)
+
+def sendListOwnerColumn(session: Session, targetWalletAddress: str) -> ResultType:
+    data = {"bizType":131, 'targetWalletAddress': targetWalletAddress}
     return __requestCommon(session, data)
 
 def __requestCommon(session: Session, data: str) -> ResultType:
