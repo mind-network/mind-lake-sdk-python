@@ -68,6 +68,10 @@ Full doc: [https://mind-network.gitbook.io/mind-lake-sdk](https://mind-network.g
     * Initial Release
 * v1.0.1
     * Fix bug
+* v1.0.2
+    * Improve performances
+* v1.0.5
+    * Keep up the version number with TypeScript SDK
 
 ## License
 
