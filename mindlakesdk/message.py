@@ -131,6 +131,10 @@ def sendQuery(session: Session, executeSql) -> ResultType:
     data = {"bizType":114, 'executeSql': executeSql}
     return __requestCommon(session, data)
 
+def sendQueryForDataAndMeta(session: Session, executeSql) -> ResultType:
+    data = {"bizType":113, 'executeSql': executeSql}
+    return __requestCommon(session, data)
+
 def sendDropCocoon(session: Session, cocoonName: str) -> ResultType:
     data = {"bizType":129, 'cocoonName': cocoonName}
     return __requestCommon(session, data)
