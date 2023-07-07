@@ -47,3 +47,5 @@ class DataLake:
     def dropTable(self, tableName: str) -> ResultType:
         return mindlakesdk.message.sendDropTable(self.__session, tableName)  
     
+    def queryForDataAndMeta(self, executeSql: str) -> ResultType:
+        return mindlakesdk.message.sendQueryForDataAndMeta(self.__session, executeSql)

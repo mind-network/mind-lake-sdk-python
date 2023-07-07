@@ -72,6 +72,8 @@ Full doc: [https://mind-network.gitbook.io/mind-lake-sdk](https://mind-network.g
     * Improve performances
 * v1.0.5
     * Keep up the version number with TypeScript SDK
+* v1.0.6
+    * Add support for Mind DataPack
 
 ## License
 
