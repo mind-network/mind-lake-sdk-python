@@ -9,15 +9,18 @@ import test_link
 import test_sharing
 import test_update
 
-def test_all(walletPrivateKeyAlice, walletPrivateKeyBob, walletAddressAlice, walletAddressBob, appKey):
-    test_create.cases(walletPrivateKeyAlice, appKey)
-    test_delete.cases(walletPrivateKeyAlice, appKey)
-    test_drop.cases(walletPrivateKeyAlice, appKey)
-    test_encryption.cases(walletPrivateKeyAlice, appKey)
-    test_insert.cases(walletPrivateKeyAlice, appKey)
-    test_link.cases(walletPrivateKeyAlice, walletPrivateKeyBob, walletAddressAlice, walletAddressBob, appKey)
-    test_sharing.cases(walletPrivateKeyAlice, walletPrivateKeyBob, walletAddressAlice, walletAddressBob, appKey)
-    test_update.cases(walletPrivateKeyAlice, appKey)
+def test_all(walletPrivateKeyAlice, walletPrivateKeyBob, walletAddressAlice, walletAddressBob, appKey, GATEWAY):
+    test_create.cases(walletPrivateKeyAlice, appKey, GATEWAY)
+    test_delete.cases(walletPrivateKeyAlice, appKey, GATEWAY)
+    test_drop.cases(walletPrivateKeyAlice, appKey, GATEWAY)
+    test_encryption.cases(walletPrivateKeyAlice, appKey, GATEWAY)
+    test_insert.cases(walletPrivateKeyAlice, appKey, GATEWAY)
+    test_link.cases(walletPrivateKeyAlice, walletPrivateKeyBob, walletAddressAlice, walletAddressBob, appKey, GATEWAY)
+    test_sharing.cases(walletPrivateKeyAlice, walletPrivateKeyBob, walletAddressAlice, walletAddressBob, appKey, GATEWAY)
+    test_update.cases(walletPrivateKeyAlice, appKey, GATEWAY)
 
 if __name__ == '__main__':
-    test_all(env.walletPrivateKeyAlice, env.walletPrivateKeyBob, env.walletAddressAlice, env.walletAddressBob, env.appKey)
+    if hasattr(env, 'GATEWAY') and env.GATEWAY:
+        test_all(env.walletPrivateKeyAlice, env.walletPrivateKeyBob, env.walletAddressAlice, env.walletAddressBob, env.appKey, env.GATEWAY)
+    else:
+        test_all(env.walletPrivateKeyAlice, env.walletPrivateKeyBob, env.walletAddressAlice, env.walletAddressBob, env.appKey, None)

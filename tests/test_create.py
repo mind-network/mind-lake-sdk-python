@@ -26,9 +26,9 @@ import mindlakesdk
 #     logging.info('createTable: %s %s %s'%(tableName, result.code, result.message))
 #     assert result.code == 40008, 'can not create table with no columns !'
 
-def test_table_create_insert_nonencrypted(walletPrivateKey, appKey):
+def test_table_create_insert_nonencrypted(walletPrivateKey, appKey, GATEWAY):
     print_test_functions()
-    mindlake = mindlakesdk.connect(walletPrivateKey, appKey, env.GATEWAY)
+    mindlake = mindlakesdk.connect(walletPrivateKey, appKey, GATEWAY)
     assert mindlake, 'mindlakesdk.connect failed !'
     test_base.drop_all_cocoon_and_table(mindlake)
     
@@ -39,9 +39,9 @@ def test_table_create_insert_nonencrypted(walletPrivateKey, appKey):
     #print(code1, code2)
     assert code1 == 0 and code2 == 40008, 'can not create duplicated table with same name 1!'
         
-def test_table_create_insert_encrypted(walletPrivateKey, appKey):
+def test_table_create_insert_encrypted(walletPrivateKey, appKey, GATEWAY):
     print_test_functions()
-    mindlake = mindlakesdk.connect(walletPrivateKey, appKey, env.GATEWAY)
+    mindlake = mindlakesdk.connect(walletPrivateKey, appKey, GATEWAY)
     assert mindlake, 'mindlakesdk.connect failed !'
     test_base.drop_all_cocoon_and_table(mindlake)
     
@@ -51,9 +51,9 @@ def test_table_create_insert_encrypted(walletPrivateKey, appKey):
     code2 = test_base.create_test_table_encrypted(mindlake, tableName)
     assert code1 == 0 and code2 == 40008, 'can not create duplicated table with same name 2!'
     
-def test_cocoon_create_tablelink(walletPrivateKey, appKey):
+def test_cocoon_create_tablelink(walletPrivateKey, appKey, GATEWAY):
     print_test_functions()
-    mindlake = mindlakesdk.connect(walletPrivateKey, appKey, env.GATEWAY)
+    mindlake = mindlakesdk.connect(walletPrivateKey, appKey, GATEWAY)
     assert mindlake, 'mindlakesdk.connect failed !'
     test_base.drop_all_cocoon_and_table(mindlake)
     
@@ -89,14 +89,14 @@ def test_cocoon_create_tablelink(walletPrivateKey, appKey):
     assert not check_table_exists(tables, tableName1) and check_table_exists(tables, tableName2), 'failed to link table2 to cocoon2 !'  
     
     
-def cases(walletPrivateKey, appKey):
+def cases(walletPrivateKey, appKey, GATEWAY):
     logging.info("==== start test | %s ===="%(__file__))
     # test_create_table_with_wrong_table_definition(walletPrivateKey, appKey)
-    test_table_create_insert_nonencrypted(walletPrivateKey, appKey)
-    test_table_create_insert_encrypted(walletPrivateKey, appKey)
-    test_cocoon_create_tablelink(walletPrivateKey, appKey)
-    logging.info("==== complete test | %s ===="%(__file__))
+    test_table_create_insert_nonencrypted(walletPrivateKey, appKey, GATEWAY)
+    test_table_create_insert_encrypted(walletPrivateKey, appKey, GATEWAY)
+    test_cocoon_create_tablelink(walletPrivateKey, appKey, GATEWAY)
+    logging.info("==== complete test | %s ====\n\n"%(__file__))
     return False
 
 if __name__ == "__main__":
-    cases(env.walletPrivateKey, env.appKey)
+    cases(env.walletPrivateKey, env.appKey, env.GATEWAY)

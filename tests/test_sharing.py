@@ -57,11 +57,11 @@ def test_query_decrypt_shared(mindlake: MindLake, ownerWalletAddress, data, gran
     print('Code: ', queryResult.code, queryResult.message, 'SELECT')
     # logging.debug(queryResult.data)
     count_select_all = len(queryResult.data['data'])
-    assert queryResult and count_select_all == 1, 'decryption test failed !'
-    row = queryResult.data['data'][0]
+    assert queryResult and count_select_all == 2, 'decryption test failed !'
+    row = queryResult.data['data'][1]
     columnList = queryResult.data['columnList']
     for i, cell in enumerate(row):
-        print(f"===== decrypt column num {i} {columnList[i]}=====")
+        print(f"===== decrypt column num {i} {columnList[i]} ===== {cell}")
         q = mindlake.cryptor.decrypt(cell)
         print('Code: ', q.code, q.message, 'DECRYPT ', columnList[i])
         print('Decrypted: Column', i, columnList[i], q.data)
@@ -99,10 +99,10 @@ def test_revoke_share(mindlake: MindLake, granteeWalletAddress):
     assert q.code == 0, 'revoke share failed !'
     
     
-def test_share_to_nobody(mindlake:MindLake, grantColumn):
+def test_share_to_nobody(mindlake:MindLake, grantColumn, walletAddressNobody):
     tableName = 'test_table_encrypted_1'
     print(f"===== share column {' '.join(grantColumn)} =====")
-    q = mindlake.permission.grant(env.walletAddressNobody, [tableName + '.data' + column for column in grantColumn])
+    q = mindlake.permission.grant(walletAddressNobody, [tableName + '.data' + column for column in grantColumn])
     print('Code: ', q.code, q.message, 'SHARE COLUMN')
     print('serialNum: ', q.data)
     assert q.code == 0, 'can not share to nobody !'
@@ -112,9 +112,13 @@ def test_share_to_nobody(mindlake:MindLake, grantColumn):
 def test_list_guarantee():
     pass
     
-def cases(walletPrivateKeyAlice, walletPrivateKeyBob, walletAddressAlice, walletAddressBob, appKey):
-    mindlakeAlice = mindlakesdk.connect(walletPrivateKeyAlice, appKey, env.GATEWAY)
+def cases(walletPrivateKeyAlice, walletPrivateKeyBob, walletAddressAlice, walletAddressBob, appKey, GATEWAY):
+    logging.info("==== start test | %s ===="%(__file__))
+    
+    mindlakeAlice = mindlakesdk.connect(walletPrivateKeyAlice, appKey, GATEWAY)
     assert mindlakeAlice, 'connect failed !'
+    mindlakeBob = mindlakesdk.connect(walletPrivateKeyBob, appKey, GATEWAY)
+    assert mindlakeBob, mindlakeBob.message
     test_base.drop_all_cocoon_and_table(mindlakeAlice)
     prepare_test(mindlakeAlice)
     data = {
@@ -127,11 +131,10 @@ def cases(walletPrivateKeyAlice, walletPrivateKeyBob, walletAddressAlice, wallet
         'timestamp': datetime.datetime.now()
     }
     test_insert_encrypted_data(mindlakeAlice, data)
+    test_insert_encrypted_data(mindlakeAlice, data)
     r = mindlakeAlice.permission.revoke(walletAddressBob)
     assert r, r.message
     print("No permission granted. Attemp to decrypt all columns")
-    mindlakeBob = mindlakesdk.connect(walletPrivateKeyBob, appKey, env.GATEWAY)
-    assert mindlakeBob, mindlakeBob.message
     test_query_decrypt_shared(mindlakeBob, walletAddressAlice, data, [])
     print("============= complete 1 ============")
 
@@ -153,6 +156,8 @@ def cases(walletPrivateKeyAlice, walletPrivateKeyBob, walletAddressAlice, wallet
     print(f"Revoke all permission. Attemp to decrypt all columns")
     test_query_decrypt_shared(mindlakeBob, walletAddressAlice, data, [])
     print("============= complete 4 ============")
+    
+    logging.info("==== complete test | %s ====\n\n"%(__file__))
 
 if __name__ == "__main__":
-    cases(env.walletPrivateKeyAlice, env.walletPrivateKeyBob, env.walletAddressAlice, env.walletAddressBob, env.appKey)
+    cases(env.walletPrivateKeyAlice, env.walletPrivateKeyBob, env.walletAddressAlice, env.walletAddressBob, env.appKey, env.GATEWAY)

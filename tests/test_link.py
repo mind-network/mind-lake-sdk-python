@@ -138,9 +138,10 @@ def test_link_nonexist_cocoon(mindlake: MindLake):
 
 
 print("============= complete 4 ============")
-def cases(walletPrivateKeyAlice, walletPrivateKeyBob, walletAddressAlice, walletAddressBob, appKey):
-    mindlakeAlice = mindlakesdk.connect(walletPrivateKeyAlice, appKey, env.GATEWAY)
-    mindlakeBob = mindlakesdk.connect(walletPrivateKeyBob, appKey, env.GATEWAY)
+def cases(walletPrivateKeyAlice, walletPrivateKeyBob, walletAddressAlice, walletAddressBob, appKey, GATEWAY):
+    logging.info("==== start test | %s ===="%(__file__))
+    mindlakeAlice = mindlakesdk.connect(walletPrivateKeyAlice, appKey, GATEWAY)
+    mindlakeBob = mindlakesdk.connect(walletPrivateKeyBob, appKey, GATEWAY)
     test_base.drop_all_cocoon_and_table(mindlakeAlice)
     test_base.drop_all_cocoon_and_table(mindlakeBob)
 
@@ -154,7 +155,8 @@ def cases(walletPrivateKeyAlice, walletPrivateKeyBob, walletAddressAlice, wallet
     
     test_link_nonexist_table(mindlakeAlice)
     test_link_nonexist_cocoon(mindlakeAlice)
+    logging.info("==== complete test | %s ====\n\n"%(__file__))
     
 if __name__ == "__main__":
-    cases(env.walletPrivateKeyAlice, env.walletPrivateKeyBob, env.walletAddressAlice, env.walletAddressBob, env.appKey)
+    cases(env.walletPrivateKeyAlice, env.walletPrivateKeyBob, env.walletAddressAlice, env.walletAddressBob, env.appKey, env.GATEWAY)
     

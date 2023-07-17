@@ -74,13 +74,15 @@ def test_update_encrypted(mindlake: MindLake):
 
 
 print("============= complete test ============")  
-def cases(walletPrivateKey, appKey):
-    mindlake = mindlakesdk.connect(walletPrivateKey, appKey, env.GATEWAY)
+def cases(walletPrivateKey, appKey, GATEWAY):
+    logging.info("==== start test | %s ===="%(__file__))
+    mindlake = mindlakesdk.connect(walletPrivateKey, appKey, GATEWAY)
     assert mindlake, 'mindlakesdk.connect failed !'
     test_base.drop_all_cocoon_and_table(mindlake)
     test_update_nonencrypted(mindlake)
     test_update_encrypted(mindlake)
+    logging.info("==== complete test | %s ====\n\n"%(__file__))
       
 if __name__ == "__main__":
-    cases(env.walletPrivateKey, env.appKey)
+    cases(env.walletPrivateKey, env.appKey, env.GATEWAY)
     

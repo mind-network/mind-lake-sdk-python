@@ -2,6 +2,9 @@
 import os
 import sys
 import inspect
+currentdir = os.path.dirname(os.path.abspath(inspect.getfile(inspect.currentframe())))
+parentdir = os.path.dirname(currentdir)
+sys.path.insert(0, parentdir)
 import logging
 #logging.info("========== set path ===========") 
 
@@ -25,7 +28,7 @@ import datetime
 
 logging.info("========== load test base ===========")
 
-import colorlog 
+# import colorlog 
 import sys
 import os
 
@@ -224,7 +227,7 @@ def insert_test_table_encrypted(mindlake: MindLake, tableName, data):
         '{encryptedData['datafloat8']}',
         '{encryptedData['datadecimal']}',
         '{encryptedData['datatext']}',
-        '{encryptedData['datatimestamp']}') RETURNING *"""
+        '{encryptedData['datatimestamp']}')"""
     logging.debug(sql)
     q = mindlake.datalake.query(sql)
     logging.debug('Code: %s %s %s', q.code, q.message, 'INSERT')
