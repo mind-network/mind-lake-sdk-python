@@ -74,7 +74,8 @@ def test_constant_encrypt_decrypt(mindlake: MindLake, data):
         else:
             assert q and q.data == data[k], 'decryption test failed !'
 
-def cases(walletPrivateKey, appKey):
+def cases(walletPrivateKey, appKey, GATEWAY):
+    logging.info("==== start test | %s ===="%(__file__))
     data =  {
         'int4': 123,
         'int8': 1234567890,
@@ -84,14 +85,17 @@ def cases(walletPrivateKey, appKey):
         'text': 'Hello',
         'timestamp': datetime.datetime.now()
     }
-    mindlake = mindlakesdk.connect(walletPrivateKey, appKey, env.GATEWAY)
+    mindlake = mindlakesdk.connect(walletPrivateKey, appKey, GATEWAY)
     assert mindlake, mindlake.message
     test_base.drop_all_cocoon_and_table(mindlake)
     prepare_test(mindlake)
     test_insert_encrypted_data(mindlake, data)
     test_query_decrypt(mindlake, data)
     test_constant_encrypt_decrypt(mindlake, data)
-    print("============= complete 1 ============")
+    logging.info("==== complete test | %s ====\n\n"%(__file__))
 
 if __name__ == "__main__":
-    cases(env.walletPrivateKeyBob, env.appKey)
+    cases(env.walletPrivateKey, env.appKey, env.GATEWAY)
+    cases(env.walletPrivateKeyAlice, env.appKey, env.GATEWAY)
+    cases(env.walletPrivateKeyBob, env.appKey, env.GATEWAY)
+    cases(env.walletPrivateKeyCharlie, env.appKey, env.GATEWAY)
