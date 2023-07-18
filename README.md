@@ -14,7 +14,7 @@ The Mind Lake SDK utilizes Mind Lake's encryption storage and privacy computing 
 
 ### Dependencies
 
-* Python > 3.10
+* Python > 3.8
 * pip
 * web3
 * pynacl
@@ -59,7 +59,7 @@ Full doc: [https://mind-network.gitbook.io/mind-lake-sdk](https://mind-network.g
 
 ## Authors
  
-* Dennis [@yuhaos](https://twitter.com/yuhaos)
+* Dennis [@NuIlPtr](https://twitter.com/nuilptr)
 * George [@georgemindnet](https://twitter.com/georgemindnet)
 
 ## Version History
@@ -74,6 +74,8 @@ Full doc: [https://mind-network.gitbook.io/mind-lake-sdk](https://mind-network.g
     * Keep up the version number with TypeScript SDK
 * v1.0.6
     * Add support for Mind DataPack
+* v1.0.7
+    * Update the connect function
 
 ## License
 

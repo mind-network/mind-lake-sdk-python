@@ -42,18 +42,14 @@ class MindLake(ResultType):
 
         result = mindlakesdk.message.getNounce(session)
         if not result:
-            self.code = result.code
-            self.message = result.message
-            self.data = result.data
+            self.__setResult(result)
             return 
         nounce = result.data
         logging.debug('getNounce: %s'%nounce)
             
         result = MindLake.__login(session, walletAccount, nounce)
         if not result:
-            self.code = result.code
-            self.message = result.message
-            self.data = result.data
+            self.__setResult(result)
             return 
         logging.debug('__login: %s'%result.data)
             
@@ -62,24 +58,23 @@ class MindLake(ResultType):
 
         result = mindlakesdk.message.getAccountInfo(session)
         if not result:
-            self.code = result.code
-            self.message = result.message
-            self.data = result.data
+            self.__setResult(result)
             return 
-        
+
+        result = mindlakesdk.keyhelper.registerMK(session)
+        if not result:
+            self.__setResult(result)
+            return 
+
         if not session.isRegistered:
             result = MindLake.__registerAccount(session, self.permission)
             if not result:
-                self.code = result.code
-                self.message = result.message
-                self.data = result.data
+                self.__setResult(result)
                 return 
         else:
             result = mindlakesdk.message.getPKid(session)
             if not result:
-                self.code = result.code
-                self.message = result.message
-                self.data = result.data
+                self.__setResult(result)
                 return 
         self.code = 0
         self.message = "Success"
@@ -94,14 +89,16 @@ class MindLake(ResultType):
 
     @staticmethod
     def __registerAccount(session: Session, permission: Permission):
-        result = mindlakesdk.keyhelper.registerMK(session)
-        if not result:
-            return result
         result = mindlakesdk.keyhelper.registerPK(session)
         if not result:
             return result
         result = permission.grantToSelf()
         return result
+    
+    def __setResult(self, result):
+        self.code = result.code
+        self.message = result.message
+        self.data = result.data
 
 connect = mindlakesdk.MindLake
     
