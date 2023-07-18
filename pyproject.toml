@@ -4,13 +4,13 @@ build-backend = "hatchling.build"
 
 [project]
 name = "mindlakesdk"
-version = "v1.0.6"
+version = "v1.0.7"
 authors = [
   { name="Mind Labs", email="biz@mindnetwork.xyz" },
 ]
 description = "A Python SDK to connect to Mind Lake"
 readme = "README.md"
-requires-python = ">=3.7"
+requires-python = ">=3.8"
 classifiers = [
     "Programming Language :: Python :: 3",
     "License :: OSI Approved :: MIT License",
