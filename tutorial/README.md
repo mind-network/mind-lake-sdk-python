@@ -87,10 +87,8 @@ cd mind-lake-sdk-python/examples
   - 2.1. Click [:art: 4.1. Prepare Wallet](Configure_Wallet.md#art-41-prepare-wallet) if test wallets (by MetaMask) are not created and `walletAddress` is not set in `env.py`.
   
   - 2.2. Click [:dart: 4.1.4 Export private key from MetaMask to env.py](Configure_Wallet.md#dart-414-export-private-key-from-metamask-to-envpy) if `walletPrivateKey` is not set in `env.py`
-  
-  - 2.3 Click [:dart: 4.1.3 Register wallets if not in whitelist during testing period](Configure_Wallet.md#dart-413-register-wallets-if-not-in-whitelist-during-testing-period) if `walletAddress` is not in whitelist during testing period.
-  
-  - 2.4 Click [:art: 4.2. Prepare appKey](Configure_Wallet.md#art-42-prepare-appkey) if `appKey` is not set.
+
+  - 2.3 Click [:art: 4.2. Prepare appKey](Configure_Wallet.md#art-42-prepare-appkey) if `appKey` is not set.
   
 3. If you want to run the examples of QuickStart, Use Case 1 and Use Case 2, you only need to fill out `walletAddressAlice`, `walletPrivateKeyAlice` and `appKey`. 
 4. If you want to run Use Case 3, you need to fill out the walltes info for all of `Alice`, `Bob` and `Charlie`.

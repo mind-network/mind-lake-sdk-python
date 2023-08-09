@@ -17,8 +17,7 @@
   - [:art: 4.1. Prepare Wallet](#art-41-prepare-wallet)
     - [:dart: 4.1.1 Install Wallet](#dart-411-install-wallet)
     - [:dart: 4.1.2 Wallet Sign In: https://scan.mindnetwork.xyz](#dart-412-wallet-sign-in-httpsscanmindnetworkxyz)
-    - [:dart: 4.1.3 Register wallets if not in whitelist during testing period](#dart-413-register-wallets-if-not-in-whitelist-during-testing-period)
-    - [:dart: 4.1.4 Copy the wallet address from MetaMask to env.py](#dart-414-copy-the-wallet-address-from-metamask-to-envpy)
+    - [:dart: 4.1.3 Copy the wallet address from MetaMask to env.py](#dart-413-copy-the-wallet-address-from-metamask-to-envpy)
     - [:dart: 4.1.4 Export private key from MetaMask to env.py](#dart-414-export-private-key-from-metamask-to-envpy)
   - [:art: 4.2. Prepare appKey](#art-42-prepare-appkey)
       - [:dart: 4.2.1 create Dapp](#dart-421-create-dapp)
@@ -68,15 +67,7 @@ __Note__ that you need to get test coin from faucets for ALL of the wallets spec
   
   ![image](./imgs/upload_chain.png)
 
-#### :dart: 4.1.3 Register wallets if not in whitelist during testing period
-1. If not in whitelist, there will be a pop-up prompt
-  
-  ![image](./imgs/white_list_popup.png)
-
-2. Click [Apply for test link ](https://bit.ly/mindalphatest)
-3. After successful application, Please be patient and wait for the review.
-
-#### :dart: 4.1.4 Copy the wallet address from MetaMask to env.py
+#### :dart: 4.1.3 Copy the wallet address from MetaMask to env.py
 Click the copy icon beside the wallet address in UI of MetaMask, and paste into env.py
 #### :dart: 4.1.4 Export private key from MetaMask to env.py
 These are the steps outlined in the [MetaMask support documentation](https://support.metamask.io/hc/en-us/articles/360015289632-How-to-export-an-account-s-private-key).
