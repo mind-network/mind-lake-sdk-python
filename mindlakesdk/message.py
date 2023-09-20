@@ -22,6 +22,14 @@ def sendLogin(session: Session, signatureHex):
     else:
         return ResultType(60001, "Network error", None)
     
+def getChainInfo(session: Session):
+    data = {"bizType":205}
+    result = request(data, session)
+    if result:
+        return ResultType(result["code"], result["message"], result["data"])
+    else:
+        return ResultType(60001, "Network error", None)
+    
 def getAccountInfo(session: Session):
     data = {"bizType":120}
     result = __requestCommon(session, data)
@@ -91,8 +99,8 @@ def getPolicyBySerialNumber(session: Session, serialNumber: str) -> ResultType:
     data = {"bizType":116, "serialNum":serialNumber}
     return __requestCommon(session, data)
 
-def getPKidByWalletAddress(session: Session, walletAddress: str) -> ResultType:
-    data = {"bizType":119, "targetWalletAddress":walletAddress}
+def getPKidByWalletAddress(session: Session, walletAddress: str, targetChainID: str) -> ResultType:
+    data = {"bizType":119, "targetWalletAddress":walletAddress, "targetChain":targetChainID}
     return __requestCommon(session, data)
 
 def sendGrant(session: Session, policyBodyJson: str, signature: str) -> ResultType:
@@ -147,16 +155,16 @@ def sendListGrantee(session: Session) -> ResultType:
     data = {"bizType":126}
     return __requestCommon(session, data)
 
-def sendListGrantedColumn(session: Session, targetWalletAddress: str) -> ResultType:
-    data = {"bizType":127, 'targetWalletAddress': targetWalletAddress}
+def sendListGrantedColumn(session: Session, targetWalletAddress: str, targetChainID: str) -> ResultType:
+    data = {"bizType":127, 'targetWalletAddress': targetWalletAddress, 'targetChain': targetChainID}
     return __requestCommon(session, data)
 
 def sendListOwner(session: Session) -> ResultType:
     data = {"bizType":130}
     return __requestCommon(session, data)
 
-def sendListOwnerColumn(session: Session, targetWalletAddress: str) -> ResultType:
-    data = {"bizType":131, 'targetWalletAddress': targetWalletAddress}
+def sendListOwnerColumn(session: Session, targetWalletAddress: str, targetChainID: str) -> ResultType:
+    data = {"bizType":131, 'targetWalletAddress': targetWalletAddress, 'targetChain': targetChainID}
     return __requestCommon(session, data)
 
 def __requestCommon(session: Session, data: str) -> ResultType:

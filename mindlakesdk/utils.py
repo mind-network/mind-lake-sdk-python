@@ -30,6 +30,7 @@ class DataType(Enum):
 class Session:
     def __init__(self) -> None:
         self.walletAddress = None
+        self.chainID = None
         self.isRegistered = False
         self.mk = None
         self.sk = None
@@ -42,6 +43,17 @@ class Session:
         self.gateway = None
         self.requstSession = None
         
+class BlockChain:
+    def __init__(self, chainObj: dict) -> None:
+        self.chainID = chainObj["chainId"]
+        self.rpcNode = chainObj["rpcNodeUrl"]
+        self.contract = chainObj["smartAddress"]
+        self.abi = chainObj["abi"]
+
+    def getNameSpace(self, walletAddress: str):
+        if self.value > 0:
+            return f'evm{self.value}_{walletAddress}'
+
 def genRSAKey():
     rsaKey = RSA.generate(2048)
     return rsaKey
@@ -113,6 +125,7 @@ def request(data, session: Session):
     headers = {}
     headers['Content-Type'] = 'application/json'
     headers['wa'] = session.walletAddress
+    headers['chain'] = session.chainID
     headers['ver'] = settings.VERSION
     headers['app'] = session.appKey
     if session.token:
