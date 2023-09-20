@@ -76,6 +76,8 @@ Full doc: [https://mind-network.gitbook.io/mind-lake-sdk](https://mind-network.g
     * Add support for Mind DataPack
 * v1.0.7
     * Update the connect function
+* v1.0.8
+    * Add support for multiple chains
 
 ## License
 

@@ -2,7 +2,7 @@ import env
 import mindlakesdk
 
 # 1. connect to mindlake
-mindlake = mindlakesdk.connect(env.walletPrivateKeyAlice, env.appKey)
+mindlake = mindlakesdk.connect(env.walletPrivateKeyAlice, env.appKey, chainID='5611')
 assert mindlake, mindlake.message
 
 result = mindlake.datalake.dropTable('wallet_balance')

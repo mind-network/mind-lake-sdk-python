@@ -12,9 +12,11 @@ class Permission:
     def __init__(self, session: Session):
         self.__session = session
 
-    def grant(self, targetWalletAddress: str, columns: list) -> ResultType:
+    def grant(self, targetWalletAddress: str, columns: list, targetChainID: str = None) -> ResultType:
         session = self.__session
-        result = mindlakesdk.message.getPKidByWalletAddress(session, targetWalletAddress)
+        if not targetChainID:
+            targetChainID = session.chainID
+        result = mindlakesdk.message.getPKidByWalletAddress(session, targetWalletAddress, targetChainID)
         if not result:
             return result
         targetPKID = result.data["publicKeyId"]
@@ -56,8 +58,8 @@ class Permission:
         signatureB64 = base64.b64encode(signature).decode('utf-8')
         return mindlakesdk.message.sendConfirm(self.__session, policyBodyJson, signatureB64)
     
-    def revoke(self, targetWalletAddress: str):
-        return self.grant(targetWalletAddress, [])
+    def revoke(self, targetWalletAddress: str, targetChainID: str = None) -> ResultType:
+        return self.grant(targetWalletAddress, [], targetChainID)
 
     def grantToSelf(self):
         result = mindlakesdk.message.getDKbyName(self.__session)
@@ -137,12 +139,16 @@ class Permission:
     def listGrantee(self) -> ResultType:
         return mindlakesdk.message.sendListGrantee(self.__session)  
     
-    def listGrantedColumn(self, walletAddress: str) -> ResultType:
-        return mindlakesdk.message.sendListGrantedColumn(self.__session, walletAddress) 
+    def listGrantedColumn(self, walletAddress: str, targetChainID: str = None) -> ResultType:
+        if not targetChainID:
+            targetChainID = self.__session.chainID
+        return mindlakesdk.message.sendListGrantedColumn(self.__session, walletAddress, targetChainID) 
     
     def listOwner(self) -> ResultType:
         return mindlakesdk.message.sendListOwner(self.__session)
     
-    def listOwnerColumn(self, walletAddress: str) -> ResultType:
-        return mindlakesdk.message.sendListOwnerColumn(self.__session, walletAddress)
+    def listOwnerColumn(self, walletAddress: str, targetChainID: str = None) -> ResultType:
+        if not targetChainID:
+            targetChainID = self.__session.chainID
+        return mindlakesdk.message.sendListOwnerColumn(self.__session, walletAddress, targetChainID)
     

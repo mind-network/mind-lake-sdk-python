@@ -1,13 +1,16 @@
 import env
 import mindlakesdk
+import logging
+
+# logging.basicConfig(level=logging.DEBUG)
 
 # the policy grant target should be an existing user in MindLake, so first register Charlie
-mindlakeCharlie = mindlakesdk.connect(env.walletPrivateKeyCharlie, env.appKey)
+mindlakeCharlie = mindlakesdk.connect(env.walletPrivateKeyCharlie, env.appKey, chainID='5611')
 assert mindlakeCharlie, mindlakeCharlie.message
 
 def writeDataGrantToCharlie(walletPrivateKey, appKey, data) -> str:
     # connect to MindLake
-    mindlake = mindlakesdk.connect(walletPrivateKey, appKey)
+    mindlake = mindlakesdk.connect(walletPrivateKey, appKey, chainID='5611')
     assert mindlake, mindlake.message
 
     result = mindlake.datalake.dropTable('transaction_temp')
@@ -61,9 +64,9 @@ assert result, result.message
 # Charlie query and calculate the total volume of each wallet
 result = mindlakeCharlie.datalake.query(f'''
 SELECT combine."WalletAddress", SUM(combine."Volume") FROM
-(SELECT "WalletAddress","Volume" FROM "{env.walletAddressAlice[2:].lower()}"."transaction_temp"
+(SELECT "WalletAddress","Volume" FROM "{mindlakeCharlie.getNameSpace(env.walletAddressAlice)}"."transaction_temp"
 UNION ALL
-SELECT "WalletAddress","Volume" FROM "{env.walletAddressBob[2:].lower()}"."transaction_temp") as combine
+SELECT "WalletAddress","Volume" FROM "{mindlakeCharlie.getNameSpace(env.walletAddressBob)}"."transaction_temp") as combine
 GROUP BY "WalletAddress"
 ''')
 assert result, result.message

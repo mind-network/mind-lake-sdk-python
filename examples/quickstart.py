@@ -5,7 +5,7 @@ import logging
 # logging.basicConfig(level=logging.DEBUG)
 
 # 1. connect to MindLake
-mindLake = mindlakesdk.connect(env.walletPrivateKeyAlice, env.appKey)
+mindLake = mindlakesdk.connect(env.walletPrivateKeyAlice, env.appKey, chainID='5611')
 assert mindLake, mindLake.message
 
 result = mindLake.datalake.dropTable('test_table_enc')

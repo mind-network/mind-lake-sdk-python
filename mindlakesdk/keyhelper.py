@@ -83,17 +83,19 @@ def __digest_gAuth(mk, grpID, dkID):
     gAuth = mindlakesdk.utils.hmacHash(mk, buf)
     return base64.b64encode(gAuth).decode(encoding="ascii")
 
-def prepareKeys(web3, walletAccount):
-    mkCipher, skCipher = __loadKeysFromChain(walletAccount.address, web3)
+def prepareKeys(web3, walletAccount, chain: mindlakesdk.utils.BlockChain):
+    mkCipher, skCipher = __loadKeysFromChain(walletAccount.address, web3, chain)
     logging.debug('mkCipher: %s'%mkCipher)
     logging.debug('skCipher: %s'%skCipher)
     
     if mkCipher and skCipher:
+        logging.debug('Found keys in contract')
         mk = __decryptWithWalletKey(walletAccount, mkCipher)
         skIV, skCipher = skCipher[:16], skCipher[16:]
         skBytes = mindlakesdk.utils.aesDecrypt(mk, skIV, skCipher)
         sk = RSA.import_key(skBytes)
     else:
+        logging.debug('No keys found in contract. Generate new keys')
         mk = mindlakesdk.utils.genAESKey()
         sk = mindlakesdk.utils.genRSAKey()
         skBytes = sk.exportKey('DER', pkcs=8)
@@ -101,14 +103,14 @@ def prepareKeys(web3, walletAccount):
         skCipher = mindlakesdk.utils.aesEncrypt(mk, skIV, skBytes)
         skCipher = skIV + skCipher
         mkCipher = __encryptWithWalletKey(walletAccount, mk)
-        __saveKeysToChain(web3, walletAccount, mkCipher, skCipher)
+        __saveKeysToChain(web3, walletAccount, mkCipher, skCipher, chain)
     logging.debug('mk: %s'%mk)
     logging.debug('sk: %s'%sk)
     return mk, sk
 
-def __saveKeysToChain(web3, walletAccount, MKCipher, SKCipher):
+def __saveKeysToChain(web3, walletAccount, MKCipher, SKCipher, chain: mindlakesdk.utils.BlockChain):
     walletAddress = walletAccount.address
-    contract = web3.eth.contract(address=settings.CONTRACT_ADDRESS, abi=settings.CONTRACT_ABI)
+    contract = web3.eth.contract(address=chain.contract, abi=chain.abi)
     nonce = web3.eth.get_transaction_count(walletAddress)
     gasEstimate = contract.functions.setKeys(MKCipher, SKCipher).estimate_gas({'from': walletAddress})
     txn = contract.functions.setKeys(MKCipher, SKCipher).build_transaction({
@@ -119,13 +121,13 @@ def __saveKeysToChain(web3, walletAccount, MKCipher, SKCipher):
     })
     signed_txn = walletAccount.signTransaction(txn)
     txn_hash = web3.eth.send_raw_transaction(signed_txn.rawTransaction)
-    print(f'Transaction sent: {txn_hash.hex()}')
+    logging.debug(f'Transaction sent: {txn_hash.hex()}')
 
     txn_receipt = web3.eth.wait_for_transaction_receipt(txn_hash)
-    print(f'Transaction mined, status: {txn_receipt["status"]}')
+    logging.debug(f'Transaction mined, status: {txn_receipt["status"]}')
 
-def __loadKeysFromChain(walletAddress: str, web3: Web3):
-    contract = web3.eth.contract(address=settings.CONTRACT_ADDRESS, abi=settings.CONTRACT_ABI)
+def __loadKeysFromChain(walletAddress: str, web3: Web3, chain: mindlakesdk.utils.BlockChain):
+    contract = web3.eth.contract(address=chain.contract, abi=chain.abi)
     return contract.functions.getKeys(walletAddress).call()
 
 def __encryptWithWalletKey(walletAccount, msg):
